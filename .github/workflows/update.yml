@@ -21,7 +21,7 @@ jobs:
           mkdir -p frames docs
           TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
           curl -s -A "Mozilla/5.0" -o "frames/frame_${TIMESTAMP}.png" "https://www.dwd.de/DWD/wetter/sat/satwetter/njob_satrad.png"
-          magick "frames/frame_${TIMESTAMP}.png" -crop 140x140+540+220 +repage "frames/frame_${TIMESTAMP}.png"
+          convert "frames/frame_${TIMESTAMP}.png" -crop 140x140+540+220 +repage "frames/frame_${TIMESTAMP}.png"
 
       - name: Nur die letzten 8 Frames behalten
         run: |
@@ -30,7 +30,7 @@ jobs:
 
       - name: GIF bauen
         run: |
-          magick -delay 100 -loop 0 $(ls -1 frames/frame_*.png | sort) docs/wolken.gif
+          convert -delay 100 -loop 0 $(ls -1 frames/frame_*.png | sort) docs/wolken.gif
           touch docs/.nojekyll
 
       - name: Änderungen speichern
