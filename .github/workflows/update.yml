@@ -33,7 +33,10 @@ jobs:
 
       - name: GIF bauen
         run: |
-          convert -delay 100 -loop 0 $(ls -1 frames/frame_*.png | sort) docs/wolken.gif
+          ALL=$(ls -1 frames/frame_*.png | sort)
+          LAST=$(echo "$ALL" | tail -n 1)
+          REST=$(echo "$ALL" | head -n -1)
+          convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
       - name: Änderungen speichern
