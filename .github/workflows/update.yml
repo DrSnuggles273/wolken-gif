@@ -53,26 +53,35 @@ jobs:
           curl -sL -A "Mozilla/5.0" -o "docs/eumetsat.png" "$IMG_URL"
           file "docs/eumetsat.png"
 
-      - name: CIRA Satellitenbild laden (Test)
+      - name: CIRA Satellitenbild laden (hochauflösend)
         run: |
           mkdir -p docs
           TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-0deg/full_disk/geocolor/latest_times.json")
-          LATEST=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -n | tail -1)
-          YEAR=${LATEST:0:4}
-          MONTH=${LATEST:4:2}
-          DAY=${LATEST:6:2}
-          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-0deg---full_disk/geocolor/${LATEST}/01"
+          CANDIDATES=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -rn | uniq | head -10)
 
-          for row in 0 1; do
-            for col in 0 1; do
-              curl -sL -A "Mozilla/5.0" -o "docs/tile_${row}_${col}.png" "${BASE}/00${row}_00${col}.png"
-            done
+          for T in $CANDIDATES; do
+            Y=${T:0:4}; M=${T:4:2}; D=${T:6:2}
+            TESTURL="https://slider.cira.colostate.edu/data/imagery/${Y}/${M}/${D}/meteosat-0deg---full_disk/geocolor/${T}/02/000_000.png"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TESTURL")
+            if [ "$STATUS" == "200" ]; then
+              LATEST=$T; YEAR=$Y; MONTH=$M; DAY=$D
+              break
+            fi
           done
+          echo "Verwendeter Zeitstempel: $LATEST"
 
-          convert docs/tile_0_0.png docs/tile_0_1.png +append docs/row0.png
-          convert docs/tile_1_0.png docs/tile_1_1.png +append docs/row1.png
-          convert docs/row0.png docs/row1.png -append docs/eumetsat_test_stitched.png
+          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-0deg---full_disk/geocolor/${LATEST}/02"
+          for row in 0 1 2 3; do
+            ROWFILES=""
+            for col in 0 1 2 3; do
+              curl -sL -A "Mozilla/5.0" -o "docs/tile_${row}_${col}.png" "${BASE}/00${row}_00${col}.png"
+              ROWFILES="$ROWFILES docs/tile_${row}_${col}.png"
+            done
+            convert $ROWFILES +append "docs/row${row}.png"
+          done
+          convert docs/row0.png docs/row1.png docs/row2.png docs/row3.png -append docs/eumetsat_full.png
           rm docs/tile_*.png docs/row*.png
+          cp docs/eumetsat_full.png docs/eumetsat.png
           
       - name: Änderungen speichern
         run: |
