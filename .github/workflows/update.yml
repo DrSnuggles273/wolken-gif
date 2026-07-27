@@ -46,26 +46,18 @@ jobs:
         run: |
           mkdir -p docs
           NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-          echo "Zeitstempel: $NOW"
 
           CREDS=$(echo -n "${EUMETSAT_KEY}:${EUMETSAT_SECRET}" | base64 -w 0)
-
-          echo "--- Token-Antwort ---"
           TOKEN_RESPONSE=$(curl -s -k -d "grant_type=client_credentials" \
             -H "Authorization: Basic ${CREDS}" \
             "https://api.eumetsat.int/token")
-          echo "$TOKEN_RESPONSE"
-
           TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
-          echo "--- Token (gekürzt): ${TOKEN:0:15}... ---"
 
-          echo "--- Bild-Anfrage HTTP-Status ---"
-          HTTP_CODE=$(curl -sL -w "%{http_code}" -o "docs/eumetsat.png" \
-            "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${NOW}&access_token=${TOKEN}")
-          echo "HTTP-Status: $HTTP_CODE"
+          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${NOW}&access_token=${TOKEN}"
+          echo "Angefragte URL: $URL"
 
-          ls -la docs/eumetsat.png
-          file "docs/eumetsat.png"
+          echo "--- Volle Server-Antwort (Header + Body) ---"
+          curl -s -k -D - "$URL" -o docs/eumetsat.png
           
       - name: Änderungen speichern
         run: |
