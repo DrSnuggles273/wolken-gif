@@ -20,7 +20,7 @@ jobs:
           mkdir -p frames docs
           TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
           LOCALTIME=$(TZ='Europe/Berlin' date +"%H:%M")
-          curl -sL -A "Mozilla/5.0" -o "frames/orig_${TIMESTAMP}.png" "https://api.sat24.com/mostrecent/DE/rainTMC"
+          curl -sL -A "Mozilla/5.0" -o "frames/orig_${TIMESTAMP}.png" "https://sat24.com/mostrecent/DE/rainTMC"
           file "frames/orig_${TIMESTAMP}.png"
           cp "frames/orig_${TIMESTAMP}.png" "docs/test_orig.png"
 
