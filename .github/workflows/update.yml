@@ -42,7 +42,7 @@ jobs:
       - name: CIRA Satellitenbild laden (hochauflösend)
         run: |
           mkdir -p docs
-          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json")
+          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)")
           CANDIDATES=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -rn | uniq | head -10)
 
           for T in $CANDIDATES; do
