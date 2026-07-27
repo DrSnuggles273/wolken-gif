@@ -42,12 +42,12 @@ jobs:
       - name: CIRA Satellitenbild laden (hochauflösend)
         run: |
           mkdir -p docs
-          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-0deg/full_disk/geocolor/latest_times.json")
+          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json")
           CANDIDATES=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -rn | uniq | head -10)
 
           for T in $CANDIDATES; do
             Y=${T:0:4}; M=${T:4:2}; D=${T:6:2}
-            TESTURL="https://slider.cira.colostate.edu/data/imagery/${Y}/${M}/${D}/meteosat-0deg---full_disk/geocolor/${T}/03/000_000.png"
+            TESTURL="https://slider.cira.colostate.edu/data/imagery/${Y}/${M}/${D}/meteosat-12---full_disk/geocolor/${T}/03/000_000.png"
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TESTURL")
             if [ "$STATUS" == "200" ]; then
               LATEST=$T; YEAR=$Y; MONTH=$M; DAY=$D
@@ -56,7 +56,7 @@ jobs:
           done
           echo "Verwendeter Zeitstempel: $LATEST"
 
-          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-0deg---full_disk/geocolor/${LATEST}/03"
+          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-12---full_disk/geocolor/${LATEST}/03"
           for row in 0 1 2 3 4 5 6 7; do
             ROWFILES=""
             for col in 0 1 2 3 4 5 6 7; do
