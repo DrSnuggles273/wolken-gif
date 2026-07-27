@@ -62,7 +62,7 @@ jobs:
           echo "--- Bild-Anfrage HTTP-Status ---"
           HTTP_CODE=$(curl -sL -w "%{http_code}" -o "docs/eumetsat.png" \
             -H "Authorization: Bearer ${TOKEN}" \
-            "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${NOW}")
+            "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${NOW}")
           echo "HTTP-Status: $HTTP_CODE"
 
           ls -la docs/eumetsat.png
