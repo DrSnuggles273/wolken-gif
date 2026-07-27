@@ -39,6 +39,25 @@ jobs:
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
+      - name: EUMETSAT-Bild laden
+        env:
+          EUMETSAT_KEY: ${{ secrets.EUMETSAT_KEY }}
+          EUMETSAT_SECRET: ${{ secrets.EUMETSAT_SECRET }}
+        run: |
+          mkdir -p docs
+          NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+
+          CREDS=$(echo -n "${EUMETSAT_KEY}:${EUMETSAT_SECRET}" | base64 -w 0)
+          TOKEN=$(curl -s -k -d "grant_type=client_credentials" \
+            -H "Authorization: Basic ${CREDS}" \
+            "https://api.eumetsat.int/token" | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+
+          curl -sL -o "docs/eumetsat.png" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${NOW}"
+
+          file "docs/eumetsat.png"
+          
       - name: Änderungen speichern
         run: |
           git config user.name "github-actions[bot]"
