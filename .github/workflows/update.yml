@@ -39,25 +39,19 @@ jobs:
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
-      - name: EUMETSAT-Bild laden
-        env:
-          EUMETSAT_KEY: ${{ secrets.EUMETSAT_KEY }}
-          EUMETSAT_SECRET: ${{ secrets.EUMETSAT_SECRET }}
+      - name: CIRA Satellitenbild laden
         run: |
           mkdir -p docs
-          NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-
-          CREDS=$(echo -n "${EUMETSAT_KEY}:${EUMETSAT_SECRET}" | base64 -w 0)
-          TOKEN_RESPONSE=$(curl -s -k -d "grant_type=client_credentials" \
-            -H "Authorization: Basic ${CREDS}" \
-            "https://api.eumetsat.int/token")
-          TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
-
-          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=msg_fes:ir108&styles=&crs=EPSG:4326&bbox=-77.0,-77.0,77.0,77.0&width=800&height=800&format=image/png&time=${NOW}&access_token=${TOKEN}"
-          echo "Angefragte URL: $URL"
-
-          echo "--- Volle Server-Antwort (Header + Body) ---"
-          curl -s -k -D - "$URL" -o docs/eumetsat.png
+          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-0deg/full_disk/geocolor/latest_times.json")
+          LATEST=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -n | tail -1)
+          YEAR=${LATEST:0:4}
+          MONTH=${LATEST:4:2}
+          DAY=${LATEST:6:2}
+          IMG_URL="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-0deg---full_disk/geocolor/${LATEST}/00/000_000.png"
+          echo "Neuester Zeitstempel: $LATEST"
+          echo "Bild-URL: $IMG_URL"
+          curl -sL -A "Mozilla/5.0" -o "docs/eumetsat.png" "$IMG_URL"
+          file "docs/eumetsat.png"
           
       - name: Änderungen speichern
         run: |
