@@ -52,6 +52,27 @@ jobs:
           echo "Bild-URL: $IMG_URL"
           curl -sL -A "Mozilla/5.0" -o "docs/eumetsat.png" "$IMG_URL"
           file "docs/eumetsat.png"
+
+      - name: CIRA Satellitenbild laden (Test)
+        run: |
+          mkdir -p docs
+          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-0deg/full_disk/geocolor/latest_times.json")
+          LATEST=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -n | tail -1)
+          YEAR=${LATEST:0:4}
+          MONTH=${LATEST:4:2}
+          DAY=${LATEST:6:2}
+          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-0deg---full_disk/geocolor/${LATEST}/01"
+
+          for row in 0 1; do
+            for col in 0 1; do
+              curl -sL -A "Mozilla/5.0" -o "docs/tile_${row}_${col}.png" "${BASE}/00${row}_00${col}.png"
+            done
+          done
+
+          convert docs/tile_0_0.png docs/tile_0_1.png +append docs/row0.png
+          convert docs/tile_1_0.png docs/tile_1_1.png +append docs/row1.png
+          convert docs/row0.png docs/row1.png -append docs/eumetsat_test_stitched.png
+          rm docs/tile_*.png docs/row*.png
           
       - name: Änderungen speichern
         run: |
