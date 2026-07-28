@@ -38,6 +38,15 @@ jobs:
           REST=$(echo "$ALL" | head -n -1)
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
+
+      - name: NASA-Satellitenbild laden (Europa)
+        run: |
+          mkdir -p docs
+          TODAY=$(date -u +"%Y-%m-%d")
+          URL="https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&TIME=${TODAY}&BBOX=35,-15,60,47.5&CRS=EPSG:4326&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor,Coastlines&FORMAT=image/png&WIDTH=1250&HEIGHT=500"
+          echo "URL: $URL"
+          curl -sL -A "Mozilla/5.0" -o "docs/eumetsat.png" "$URL"
+          file "docs/eumetsat.png"
           
      # - name: CIRA Satellitenbild laden (hochauflösend)
      #   run: |
