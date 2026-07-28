@@ -42,29 +42,31 @@ jobs:
       - name: FU-Berlin Webcam (Dahlem NNO) laden
         run: |
           mkdir -p docs
-          BASE="https://wind.met.fu-berlin.de/storage/webcams/metfubcm02/webcam_metfubcm02_"
-          NOW_EPOCH=$(date +%s)
-          ROUNDED_EPOCH=$(( NOW_EPOCH - (NOW_EPOCH % 600) ))
-          FOUND=0
-          for i in 0 1 2 3 4 5; do
-            T_EPOCH=$(( ROUNDED_EPOCH - i*600 ))
-            T=$(TZ='Europe/Berlin' date -d "@$T_EPOCH" +"%Y%m%d_%H%M")
-            URL="${BASE}${T}.jpg"
+          PAGE_URL="https://wind.met.fu-berlin.de/webcams/5"
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+
+          # Aktuelle Seite laden und den zuletzt gelisteten Bilddateinamen auslesen
+          # (die Seite listet die letzten Bilder aufsteigend sortiert, das letzte ist das neueste)
+          LATEST_FILE=$(curl -s -A "$UA" -H "Referer: $PAGE_URL" "$PAGE_URL" \
+            | grep -oE 'webcam_metfubcm02_[0-9]{8}_[0-9]{4}\.jpg' \
+            | sort -u \
+            | tail -n 1)
+
+          if [ -z "$LATEST_FILE" ]; then
+            echo "Konnte keinen aktuellen Dateinamen auf der Seite finden."
+          else
+            URL="https://wind.met.fu-berlin.de/storage/webcams/metfubcm02/${LATEST_FILE}"
             STATUS=$(curl -s -o /tmp/webcam.jpg -w "%{http_code}" \
-              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" \
-              -H "Referer: https://wind.met.fu-berlin.de/webcams/5" \
+              -A "$UA" -H "Referer: $PAGE_URL" \
               -H "Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8" \
               "$URL")
-            echo "Versuch $i ($URL): HTTP $STATUS"
+            echo "Neuestes Bild laut Seite: $LATEST_FILE -> HTTP $STATUS"
             if [ "$STATUS" == "200" ]; then
               cp /tmp/webcam.jpg docs/webcam_dahlem_nno.jpg
               echo "Verwendet: $URL"
-              FOUND=1
-              break
+            else
+              echo "Download fehlgeschlagen, docs/webcam_dahlem_nno.jpg bleibt unverändert."
             fi
-          done
-          if [ "$FOUND" == "0" ]; then
-            echo "Kein aktuelles Webcam-Bild gefunden, docs/webcam_dahlem_nno.jpg bleibt unverändert."
           fi
           
       - name: NASA-Satellitenbild laden (Europa)
