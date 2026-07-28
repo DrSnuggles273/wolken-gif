@@ -50,7 +50,12 @@ jobs:
             T_EPOCH=$(( ROUNDED_EPOCH - i*600 ))
             T=$(TZ='Europe/Berlin' date -d "@$T_EPOCH" +"%Y%m%d_%H%M")
             URL="${BASE}${T}.jpg"
-            STATUS=$(curl -s -o /tmp/webcam.jpg -w "%{http_code}" -A "Mozilla/5.0" "$URL")
+            STATUS=$(curl -s -o /tmp/webcam.jpg -w "%{http_code}" \
+              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" \
+              -H "Referer: https://wind.met.fu-berlin.de/webcams/5" \
+              -H "Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8" \
+              "$URL")
+            echo "Versuch $i ($URL): HTTP $STATUS"
             if [ "$STATUS" == "200" ]; then
               cp /tmp/webcam.jpg docs/webcam_dahlem_nno.jpg
               echo "Verwendet: $URL"
