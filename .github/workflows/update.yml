@@ -77,6 +77,26 @@ jobs:
      #     convert docs/row0.png docs/row1.png docs/row2.png docs/row3.png docs/row4.png docs/row5.png docs/row6.png docs/row7.png -append docs/eumetsat_full.png
      #     rm docs/tile_*.png docs/row*.png
      #     cp docs/eumetsat_full.png docs/eumetsat.png
+      - name: Meteosat-Aktualität prüfen und ggf. benachrichtigen
+        run: |
+          LATEST=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)" | grep -oE '[0-9]{14}' | sort -n | tail -1)
+          LATEST_EPOCH=$(date -u -d "${LATEST:0:8} ${LATEST:8:2}:${LATEST:10:2}:${LATEST:12:2}" +%s)
+          NOW_EPOCH=$(date -u +%s)
+          AGE=$(( (NOW_EPOCH - LATEST_EPOCH) / 60 ))
+          echo "Neuester Meteosat-Zeitstempel: $LATEST (Alter: ${AGE} Minuten)"
+
+          if [ "$AGE" -lt 60 ]; then
+            if [ ! -f docs/.meteosat_notified ]; then
+              curl -s -d "Meteosat-Live-Bild ist wieder aktuell! (Stand: $LATEST)" "https://ntfy.sh/ringo-meteosat-check-2026"
+              touch docs/.meteosat_notified
+              echo "Benachrichtigung gesendet."
+            else
+              echo "Bereits benachrichtigt, überspringe."
+            fi
+          else
+            rm -f docs/.meteosat_notified
+            echo "Weiterhin veraltet, keine Aktion."
+          fi
           
       - name: Änderungen speichern
         run: |
