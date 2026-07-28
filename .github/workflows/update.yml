@@ -39,6 +39,29 @@ jobs:
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
+      - name: FU-Berlin Webcam (Dahlem NNO) laden
+        run: |
+          mkdir -p docs
+          BASE="https://wind.met.fu-berlin.de/storage/webcams/metfubcm02/webcam_metfubcm02_"
+          NOW_EPOCH=$(date +%s)
+          ROUNDED_EPOCH=$(( NOW_EPOCH - (NOW_EPOCH % 600) ))
+          FOUND=0
+          for i in 0 1 2 3 4 5; do
+            T_EPOCH=$(( ROUNDED_EPOCH - i*600 ))
+            T=$(TZ='Europe/Berlin' date -d "@$T_EPOCH" +"%Y%m%d_%H%M")
+            URL="${BASE}${T}.jpg"
+            STATUS=$(curl -s -o /tmp/webcam.jpg -w "%{http_code}" -A "Mozilla/5.0" "$URL")
+            if [ "$STATUS" == "200" ]; then
+              cp /tmp/webcam.jpg docs/webcam_dahlem_nno.jpg
+              echo "Verwendet: $URL"
+              FOUND=1
+              break
+            fi
+          done
+          if [ "$FOUND" == "0" ]; then
+            echo "Kein aktuelles Webcam-Bild gefunden, docs/webcam_dahlem_nno.jpg bleibt unverändert."
+          fi
+          
       - name: NASA-Satellitenbild laden (Europa)
         run: |
           mkdir -p docs
@@ -77,6 +100,7 @@ jobs:
      #     convert docs/row0.png docs/row1.png docs/row2.png docs/row3.png docs/row4.png docs/row5.png docs/row6.png docs/row7.png -append docs/eumetsat_full.png
      #     rm docs/tile_*.png docs/row*.png
      #     cp docs/eumetsat_full.png docs/eumetsat.png
+     
       - name: Meteosat-Aktualität prüfen und ggf. benachrichtigen
         run: |
           LATEST=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)" | grep -oE '[0-9]{14}' | sort -n | tail -1)
