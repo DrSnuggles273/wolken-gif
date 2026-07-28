@@ -38,40 +38,36 @@ jobs:
           REST=$(echo "$ALL" | head -n -1)
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
-
-      - name: JSON-Inhalt prüfen
-        run: |
-          curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)"
           
-      - name: CIRA Satellitenbild laden (hochauflösend)
-        run: |
-          mkdir -p docs
-          TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)")
-          CANDIDATES=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -rn | uniq | head -10)
+     # - name: CIRA Satellitenbild laden (hochauflösend)
+     #   run: |
+     #     mkdir -p docs
+     #     TIMES_JSON=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)")
+     #     CANDIDATES=$(echo "$TIMES_JSON" | grep -oE '[0-9]{14}' | sort -rn | uniq | head -10)
 
-          for T in $CANDIDATES; do
-            Y=${T:0:4}; M=${T:4:2}; D=${T:6:2}
-            TESTURL="https://slider.cira.colostate.edu/data/imagery/${Y}/${M}/${D}/meteosat-12---full_disk/geocolor/${T}/03/000_000.png"
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TESTURL")
-            if [ "$STATUS" == "200" ]; then
-              LATEST=$T; YEAR=$Y; MONTH=$M; DAY=$D
-              break
-            fi
-          done
-          echo "Verwendeter Zeitstempel: $LATEST"
+     #     for T in $CANDIDATES; do
+     #       Y=${T:0:4}; M=${T:4:2}; D=${T:6:2}
+     #       TESTURL="https://slider.cira.colostate.edu/data/imagery/${Y}/${M}/${D}/meteosat-12---full_disk/geocolor/${T}/03/000_000.png"
+     #       STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TESTURL")
+     #       if [ "$STATUS" == "200" ]; then
+     #         LATEST=$T; YEAR=$Y; MONTH=$M; DAY=$D
+     #         break
+     #       fi
+     #     done
+     #     echo "Verwendeter Zeitstempel: $LATEST"
 
-          BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-12---full_disk/geocolor/${LATEST}/03"
-          for row in 0 1 2 3 4 5 6 7; do
-            ROWFILES=""
-            for col in 0 1 2 3 4 5 6 7; do
-              curl -sL -A "Mozilla/5.0" -o "docs/tile_${row}_${col}.png" "${BASE}/00${row}_00${col}.png"
-              ROWFILES="$ROWFILES docs/tile_${row}_${col}.png"
-            done
-            convert $ROWFILES +append "docs/row${row}.png"
-          done
-          convert docs/row0.png docs/row1.png docs/row2.png docs/row3.png docs/row4.png docs/row5.png docs/row6.png docs/row7.png -append docs/eumetsat_full.png
-          rm docs/tile_*.png docs/row*.png
-          cp docs/eumetsat_full.png docs/eumetsat.png
+     #     BASE="https://slider.cira.colostate.edu/data/imagery/${YEAR}/${MONTH}/${DAY}/meteosat-12---full_disk/geocolor/${LATEST}/03"
+     #     for row in 0 1 2 3 4 5 6 7; do
+     #       ROWFILES=""
+     #       for col in 0 1 2 3 4 5 6 7; do
+     #         curl -sL -A "Mozilla/5.0" -o "docs/tile_${row}_${col}.png" "${BASE}/00${row}_00${col}.png"
+     #         ROWFILES="$ROWFILES docs/tile_${row}_${col}.png"
+     #       done
+     #       convert $ROWFILES +append "docs/row${row}.png"
+     #     done
+     #     convert docs/row0.png docs/row1.png docs/row2.png docs/row3.png docs/row4.png docs/row5.png docs/row6.png docs/row7.png -append docs/eumetsat_full.png
+     #     rm docs/tile_*.png docs/row*.png
+     #     cp docs/eumetsat_full.png docs/eumetsat.png
           
       - name: Änderungen speichern
         run: |
