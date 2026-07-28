@@ -42,7 +42,7 @@ jobs:
       - name: NASA-Satellitenbild laden (Europa)
         run: |
           mkdir -p docs
-          TODAY=$(date -u -d "yesterday" +"%Y-%m-%d")
+          TODAY=$(date -u +"%Y-%m-%d")
           URL="https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&TIME=${TODAY}&BBOX=35,-15,60,47.5&CRS=EPSG:4326&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor,Coastlines&FORMAT=image/png&WIDTH=1250&HEIGHT=500"
           echo "URL: $URL"
           curl -sL -A "Mozilla/5.0" -o "docs/nasa.png" "$URL"
