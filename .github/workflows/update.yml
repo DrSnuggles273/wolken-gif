@@ -39,6 +39,10 @@ jobs:
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
+      - name: JSON-Inhalt prüfen
+        run: |
+          curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)"
+          
       - name: CIRA Satellitenbild laden (hochauflösend)
         run: |
           mkdir -p docs
