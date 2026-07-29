@@ -85,7 +85,7 @@ jobs:
           convert docs/eumetsat.jpg \
             -fill black -draw "rectangle 1152,344 1232,380" \
             -fill white -pointsize 28 -annotate +1156+372 "$LOCALTIME" \
-            -fill red -stroke white -strokewidth 1 -draw "circle 768,150 772,150" \
+            -fill red -stroke white -strokewidth 1 -draw "circle 766,150 770,150" \
             docs/eumetsat.jpg
           file "docs/eumetsat.jpg"
           
