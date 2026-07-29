@@ -85,8 +85,8 @@ jobs:
           curl -sL -o "docs/eumetsat.jpg" "$URL"
 
           convert docs/eumetsat.jpg \
-            -fill black -draw "rectangle 1149,320 1229,356" \
-            -fill white -pointsize 28 -annotate +1154+348 "$LOCALTIME" \
+            -fill black -draw "rectangle 1151,324 1231,360" \
+            -fill white -pointsize 28 -annotate +1155+352 "$LOCALTIME" \
             docs/eumetsat.jpg
 
           file "docs/eumetsat.jpg"
