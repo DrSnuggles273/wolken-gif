@@ -21,7 +21,7 @@ jobs:
           TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
           LOCALTIME=$(TZ='Europe/Berlin' date +"%H:%M")
           curl -s -A "Mozilla/5.0" -o "frames/orig_${TIMESTAMP}.png" "https://www.dwd.de/DWD/wetter/sat/satwetter/njob_satrad.png"
-          convert "frames/orig_${TIMESTAMP}.png" -crop 80x80+540+220 +repage "frames/frame_${TIMESTAMP}.png"
+          convert "frames/orig_${TIMESTAMP}.png" -crop 140x140+540+220 +repage "frames/frame_${TIMESTAMP}.png"
           convert "frames/frame_${TIMESTAMP}.png" -filter Lanczos -resize 200% "frames/frame_${TIMESTAMP}.png"
           convert -size 32x12 xc:black -fill white -gravity center -pointsize 12 -annotate 0 "$LOCALTIME" "frames/time_${TIMESTAMP}.png"
           convert "frames/frame_${TIMESTAMP}.png" "frames/time_${TIMESTAMP}.png" -gravity SouthEast -geometry +24+24 -composite "frames/frame_${TIMESTAMP}.png"
@@ -85,8 +85,8 @@ jobs:
           curl -sL -o "docs/eumetsat.jpg" "$URL"
 
           convert docs/eumetsat.jpg \
-            -fill black -draw "rectangle 1140,320 1220,360" \
-            -fill white -pointsize 28 -annotate +1150+347 "$LOCALTIME" \
+            -fill black -draw "rectangle 1140,320 1220,356" \
+            -fill white -pointsize 28 -annotate +1146+348 "$LOCALTIME" \
             docs/eumetsat.jpg
 
           file "docs/eumetsat.jpg"
