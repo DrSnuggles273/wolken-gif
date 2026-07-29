@@ -73,17 +73,6 @@ jobs:
             fi
           fi
           
-      - name: EUMETSAT YouTube-Stream Test
-        run: |
-          pip install -q yt-dlp
-          sudo apt-get install -y ffmpeg -q
-
-          STREAM_URL=$(yt-dlp -g "https://www.youtube.com/watch?v=nigtvuOspmM" 2>&1 | tail -1)
-          echo "Stream-URL: $STREAM_URL"
-
-          ffmpeg -y -i "$STREAM_URL" -frames:v 1 docs/eumetsat_youtube_test.png 2>&1 | tail -20
-          file docs/eumetsat_youtube_test.png
-          
      # - name: CIRA Satellitenbild laden (hochauflösend)
      #   run: |
      #     mkdir -p docs
