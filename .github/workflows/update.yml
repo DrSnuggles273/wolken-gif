@@ -73,14 +73,16 @@ jobs:
             fi
           fi
           
-      - name: NASA-Satellitenbild laden (Europa)
+      - name: EUMETSAT YouTube-Stream Test
         run: |
-          mkdir -p docs
-          TODAY=$(date -u +"%Y-%m-%d")
-          URL="https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&TIME=${TODAY}&BBOX=35,-15,60,47.5&CRS=EPSG:4326&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor,Coastlines&FORMAT=image/png&WIDTH=1250&HEIGHT=500"
-          echo "URL: $URL"
-          curl -sL -A "Mozilla/5.0" -o "docs/nasa.png" "$URL"
-          file "docs/nasa.png"
+          pip install -q yt-dlp
+          sudo apt-get install -y ffmpeg -q
+
+          STREAM_URL=$(yt-dlp -g "https://www.youtube.com/watch?v=nigtvuOspmM" 2>&1 | tail -1)
+          echo "Stream-URL: $STREAM_URL"
+
+          ffmpeg -y -i "$STREAM_URL" -frames:v 1 docs/eumetsat_youtube_test.png 2>&1 | tail -20
+          file docs/eumetsat_youtube_test.png
           
      # - name: CIRA Satellitenbild laden (hochauflösend)
      #   run: |
