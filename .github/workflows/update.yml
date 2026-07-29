@@ -72,6 +72,16 @@ jobs:
               echo "Keines der gelisteten Bilder war abrufbar, docs/webcam_dahlem_nno.jpg bleibt unverändert."
             fi
           fi
+
+      - name: EUMETSAT-Bild laden (2h Verzögerung)
+        run: |
+          mkdir -p docs
+          OLDER_TIME=$(date -u -d "2 hours ago" +"%Y-%m-%dT%H:%M:%S.000Z")
+          echo "Angefragter Zeitpunkt: $OLDER_TIME"
+
+          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=52.3,13.0,52.7,13.8&width=400&height=300&format=image/png&time=${OLDER_TIME}"
+          curl -sL -o "docs/eumetsat.png" "$URL"
+          file "docs/eumetsat.png"
           
      # - name: CIRA Satellitenbild laden (hochauflösend)
      #   run: |
