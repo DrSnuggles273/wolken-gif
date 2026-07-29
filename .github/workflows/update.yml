@@ -79,9 +79,9 @@ jobs:
           OLDER_TIME=$(date -u -d "30 minutes ago" +"%Y-%m-%dT%H:%M:%S.000Z")
           echo "Angefragter Zeitpunkt: $OLDER_TIME"
 
-          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=35.0,-15.0,60.0,47.5&width=2500&height=1000&format=image/png&time=${OLDER_TIME}"
-          curl -sL -o "docs/eumetsat.png" "$URL"
-          file "docs/eumetsat.png"
+          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=35.0,-15.0,60.0,47.5&width=1250&height=500&format=image/jpeg&time=${OLDER_TIME}"
+          curl -sL -o "docs/eumetsat.jpg" "$URL"
+          file "docs/eumetsat.jpg"
           
      # - name: CIRA Satellitenbild laden (hochauflösend)
      #   run: |
