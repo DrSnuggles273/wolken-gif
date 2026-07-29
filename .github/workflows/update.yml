@@ -80,7 +80,7 @@ jobs:
           LOCALTIME=$(TZ='Europe/Berlin' date -d "30 minutes ago" +"%H:%M")
           echo "Angefragter Zeitpunkt: $OLDER_TIME"
 
-          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=35.0,-15.0,60.0,47.5&width=1250&height=500&format=image/jpeg&time=${OLDER_TIME}"
+          URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=25.0,-15.0,50.0,47.5&width=1250&height=500&format=image/jpeg&time=${OLDER_TIME}"
           curl -sL -o "docs/eumetsat.jpg" "$URL"
 
           convert docs/eumetsat.jpg \
