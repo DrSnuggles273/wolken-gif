@@ -49,8 +49,8 @@ jobs:
           URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=35.0,-25.0,60.0,37.5&width=1250&height=500&format=image/jpeg&time=${OLDER_TIME}"
           curl -sL -o "docs/eumetsat.jpg" "$URL"
           convert docs/eumetsat.jpg \
-            -fill black -draw "rectangle 100,344 234,380" \
-            -fill white -pointsize 28 -annotate +156+372 "$LOCALTIME" \
+            -fill black -draw "rectangle 100,344 184,380" \
+            -fill white -pointsize 28 -annotate +106+372 "$LOCALTIME" \
             -fill red -stroke white -strokewidth 1 -draw "circle 766,150 770,150" \
             docs/eumetsat.jpg
           file "docs/eumetsat.jpg"
