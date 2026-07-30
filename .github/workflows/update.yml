@@ -147,3 +147,7 @@ jobs:
           git add frames docs
           git commit -m "Update Wolken GIF" || echo "Keine Änderungen"
           git push
+
+      - name: Verfügbare Schriftarten auflisten
+        run: |
+          fc-list | sort
