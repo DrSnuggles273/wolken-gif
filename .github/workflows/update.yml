@@ -24,7 +24,7 @@ jobs:
           convert "frames/orig_${TIMESTAMP}.png" -crop 160x120+520+220 +repage "frames/frame_${TIMESTAMP}.png"
           convert "frames/frame_${TIMESTAMP}.png" -filter Lanczos -resize 400% "frames/frame_${TIMESTAMP}.png"
           convert -size 96x42 xc:black -fill white -gravity center -pointsize 32 -annotate 0 "$LOCALTIME" "frames/time_${TIMESTAMP}.png"
-          convert "frames/frame_${TIMESTAMP}.png" "frames/time_${TIMESTAMP}.png" -gravity SouthEast -geometry +2+23 -composite "frames/frame_${TIMESTAMP}.png"
+          convert "frames/frame_${TIMESTAMP}.png" "frames/time_${TIMESTAMP}.png" -gravity SouthEast -geometry +2+25 -composite "frames/frame_${TIMESTAMP}.png"
           rm "frames/orig_${TIMESTAMP}.png" "frames/time_${TIMESTAMP}.png"
 
       - name: Nur die letzten 8 Frames behalten
