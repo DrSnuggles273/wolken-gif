@@ -40,40 +40,6 @@ jobs:
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/wolken.gif
           touch docs/.nojekyll
 
-      - name: FU-Berlin Webcam (Dahlem NNO) laden
-        run: |
-          mkdir -p docs
-          PAGE_URL="https://wind.met.fu-berlin.de/webcams/5"
-          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-
-          # Alle auf der Seite gelisteten Dateinamen einsammeln, neueste zuerst
-          FILES=$(curl -s -A "$UA" -H "Referer: $PAGE_URL" "$PAGE_URL" \
-            | grep -oE 'webcam_metfubcm02_[0-9]{8}_[0-9]{4}\.jpg' \
-            | sort -u -r)
-
-          if [ -z "$FILES" ]; then
-            echo "Konnte keine Dateinamen auf der Seite finden."
-          else
-            FOUND=0
-            for F in $FILES; do
-              URL="https://wind.met.fu-berlin.de/storage/webcams/metfubcm02/${F}"
-              STATUS=$(curl -s -o /tmp/webcam.jpg -w "%{http_code}" \
-                -A "$UA" -H "Referer: $PAGE_URL" \
-                -H "Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8" \
-                "$URL")
-              echo "Probiere $F -> HTTP $STATUS"
-              if [ "$STATUS" == "200" ]; then
-                cp /tmp/webcam.jpg docs/webcam_dahlem_nno.jpg
-                echo "Verwendet: $URL"
-                FOUND=1
-                break
-              fi
-            done
-            if [ "$FOUND" == "0" ]; then
-              echo "Keines der gelisteten Bilder war abrufbar, docs/webcam_dahlem_nno.jpg bleibt unverändert."
-            fi
-          fi
-
       - name: EUMETSAT-Bild laden (30 Min. Verzögerung, Europa)
         run: |
           mkdir -p docs
