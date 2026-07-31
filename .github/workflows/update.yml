@@ -20,7 +20,13 @@ jobs:
           mkdir -p frames docs
           TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
           LOCALTIME=$(TZ='Europe/Berlin' date +"%H:%M")
-          curl -s --retry 3 --retry-delay 2 --fail -A "Mozilla/5.0" -o "frames/orig_${TIMESTAMP}.png" "https://www.dwd.de/DWD/wetter/sat/satwetter/njob_satrad.png"
+          curl -s --retry 5 --retry-delay 3 --retry-all-errors --fail -A "Mozilla/5.0" -o "frames/orig_${TIMESTAMP}.png" "https://www.dwd.de/DWD/wetter/sat/satwetter/njob_satrad.png"
+
+          if [ ! -s "frames/orig_${TIMESTAMP}.png" ]; then
+            echo "Download fehlgeschlagen, überspringe diesen Durchlauf."
+            exit 0
+          fi
+
           convert "frames/orig_${TIMESTAMP}.png" -crop 160x120+520+220 +repage "frames/frame_${TIMESTAMP}.png"
           convert "frames/frame_${TIMESTAMP}.png" -filter Lanczos -resize 400% "frames/frame_${TIMESTAMP}.png"
           convert -size 96x44 xc:black -fill white -gravity center -pointsize 33 -annotate 0 "$LOCALTIME" "frames/time_${TIMESTAMP}.png"
