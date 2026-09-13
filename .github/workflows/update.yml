@@ -54,12 +54,19 @@ jobs:
           echo "Angefragter Zeitpunkt: $OLDER_TIME"
           URL="https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=EPSG:4326&bbox=35.0,-25.0,60.0,37.5&width=1250&height=500&format=image/jpeg&time=${OLDER_TIME}"
 
-          curl -sL --retry 5 --retry-delay 3 --retry-all-errors --fail -o "docs/eumetsat.jpg" "$URL"
-
-          if ! identify "docs/eumetsat.jpg" > /dev/null 2>&1; then
-            echo "Heruntergeladenes EUMETSAT-Bild ist ungültig/beschädigt, überspringe diesen Durchlauf."
+          if ! curl -sL --retry 5 --retry-delay 3 --retry-all-errors --fail -o "docs/eumetsat_new.jpg" "$URL"; then
+            echo "EUMETSAT-Abruf fehlgeschlagen, überspringe diesen Durchlauf (behalte altes Bild)."
+            rm -f "docs/eumetsat_new.jpg"
             exit 0
           fi
+
+          if ! convert -regard-warnings "docs/eumetsat_new.jpg" -crop 1250x500+0+0 +repage "docs/eumetsat_new.jpg" 2>/dev/null; then
+            echo "EUMETSAT-Bild beschädigt, überspringe diesen Durchlauf (behalte altes Bild)."
+            rm -f "docs/eumetsat_new.jpg"
+            exit 0
+          fi
+
+          mv "docs/eumetsat_new.jpg" "docs/eumetsat.jpg"
 
           convert docs/eumetsat.jpg \
             -fill black -draw "rectangle 1152,344 1232,380" \
