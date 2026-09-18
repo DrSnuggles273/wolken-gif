@@ -134,3 +134,44 @@ jobs:
           git commit -m "Update Wolken GIF" || echo "Keine Änderungen"
           git pull --rebase origin main
           git push
+      
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Meteoblue-Karte per Screenshot laden
+        run: |
+          npm install puppeteer
+          cat > screenshot.js << 'EOF'
+          const puppeteer = require('puppeteer');
+
+          (async () => {
+            const browser = await puppeteer.launch({
+              headless: 'new',
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1280, height: 720 });
+
+            await page.goto('https://www.meteoblue.com/de/wetter/maps/charlottenburg_deutschland_2940187#coords=7.14/52.433/13.734&map=satellite~radar~none~none~temperatureObsOverlay%2CgraticuleOverlay', {
+              waitUntil: 'networkidle2',
+              timeout: 60000
+            });
+
+            try {
+              await page.waitForSelector('button[aria-label="Accept"], .cookie-consent button, #onetrust-accept-btn-handler', { timeout: 5000 });
+              await page.click('button[aria-label="Accept"], .cookie-consent button, #onetrust-accept-btn-handler');
+              console.log('Cookie-Banner geklickt.');
+            } catch (e) {
+              console.log('Kein Cookie-Banner gefunden.');
+            }
+
+            await new Promise(r => setTimeout(r, 8000));
+
+            await page.screenshot({ path: 'docs/meteoblue.jpg', type: 'jpeg', quality: 85 });
+            await browser.close();
+          })();
+          EOF
+          node screenshot.js
+          file docs/meteoblue.jpg
