@@ -179,7 +179,7 @@ jobs:
       - name: Tesseract OCR installieren
         run: sudo apt-get install -y tesseract-ocr
 
-      - name: Meteoblue-Zeitstempel auslesen und einfügen
+      - name: Meteoblue-Zeitstempel auslesen, zuschneiden und einfügen
         run: |
           convert docs/meteoblue.jpg -crop 44x24+928+674 +repage /tmp/time_crop.png
           convert /tmp/time_crop.png -resize 400% -colorspace Gray -threshold 50% /tmp/time_crop_processed.png
@@ -191,11 +191,14 @@ jobs:
             echo "OCR-Ergebnis unplausibel, nutze aktuelle Uhrzeit als Fallback: $RAW_TEXT"
           fi
 
-          convert docs/meteoblue.jpg \
-            -fill black -draw "rectangle 8,8 108,44" \
-            -fill white -pointsize 24 -annotate +14+34 "$RAW_TEXT" \
-            docs/meteoblue.jpg
+          convert docs/meteoblue.jpg -crop 842x632+80+8 +repage docs/meteoblue.jpg
 
+          convert docs/meteoblue.jpg \
+            -fill black -draw "rectangle 0,0 100,36" \
+            -fill white -pointsize 24 -annotate +6+26 "$RAW_TEXT" \
+            -gravity SouthEast -geometry +0+0 \
+            docs/meteoblue.jpg
+            
       - name: Meteoblue-Frame speichern
         run: |
           mkdir -p meteoblue_frames
