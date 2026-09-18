@@ -205,7 +205,10 @@ jobs:
 
       - name: Meteoblue-GIF bauen
         run: |
-          convert -delay 100 -loop 0 $(ls -1 meteoblue_frames/frame_*.jpg | sort) docs/meteoblue.gif
+          ALL=$(ls -1 meteoblue_frames/frame_*.jpg | sort)
+          LAST=$(echo "$ALL" | tail -n 1)
+          REST=$(echo "$ALL" | head -n -1)
+          convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/meteoblue.gif
 
       - name: Änderungen speichern
         run: |
