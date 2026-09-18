@@ -193,11 +193,8 @@ jobs:
 
           convert docs/meteoblue.jpg -crop 842x632+80+8 +repage docs/meteoblue.jpg
 
-          convert docs/meteoblue.jpg \
-            -fill black -draw "rectangle 0,0 100,36" \
-            -fill white -pointsize 24 -annotate +6+26 "$RAW_TEXT" \
-            -gravity SouthEast -geometry +0+0 \
-            docs/meteoblue.jpg
+          convert -size 100x36 xc:black -fill white -gravity center -pointsize 24 -annotate 0 "$RAW_TEXT" /tmp/time_box.png
+          convert docs/meteoblue.jpg /tmp/time_box.png -gravity SouthEast -geometry +0+0 -composite docs/meteoblue.jpg
             
       - name: Meteoblue-Frame speichern
         run: |
