@@ -145,7 +145,7 @@ jobs:
             const page = await browser.newPage();
             await page.setViewport({ width: 1280, height: 720 });
 
-            await page.goto('https://www.meteoblue.com/de/wetter/maps/charlottenburg_deutschland_2940187#coords=7.14/52.433/13.734&map=satellite~radar~none~none~temperatureObsOverlay%2CgraticuleOverlay', {
+            await page.goto('https://www.meteoblue.com/de/wetter/maps/charlottenburg_deutschland_2940187#coords=7.14/52.433/13.734&map=satellite~radar~none~none~none', {
               waitUntil: 'networkidle2',
               timeout: 60000
             });
