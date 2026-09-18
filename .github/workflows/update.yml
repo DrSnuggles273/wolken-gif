@@ -214,4 +214,13 @@ jobs:
           git add frames docs meteoblue_frames
           git commit -m "Update Wolken GIF" || echo "Keine Änderungen"
           git pull --rebase origin main
-          git push
+
+          for i in 1 2 3; do
+            if git push; then
+              echo "Push erfolgreich."
+              break
+            else
+              echo "Push fehlgeschlagen (Versuch $i), warte 10 Sekunden..."
+              sleep 10
+            fi
+          done
