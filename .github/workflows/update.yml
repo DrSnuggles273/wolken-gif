@@ -191,7 +191,7 @@ jobs:
             echo "OCR-Ergebnis unplausibel, nutze aktuelle Uhrzeit als Fallback: $RAW_TEXT"
           fi
 
-          convert docs/meteoblue.jpg -crop 842x632+80+8 +repage docs/meteoblue.jpg
+          convert docs/meteoblue.jpg -crop 360x270+315+193 +repage docs/meteoblue.jpg
 
           convert -size 96x44 xc:black -fill white -gravity center -pointsize 33 -annotate 0 "$RAW_TEXT" /tmp/time_box.png
           convert docs/meteoblue.jpg /tmp/time_box.png -gravity SouthEast -geometry +2+24 -composite docs/meteoblue.jpg
