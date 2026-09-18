@@ -150,13 +150,22 @@ jobs:
               timeout: 60000
             });
 
-            try {
-              await page.waitForSelector('button[aria-label="Accept"], .cookie-consent button, #onetrust-accept-btn-handler', { timeout: 5000 });
-              await page.click('button[aria-label="Accept"], .cookie-consent button, #onetrust-accept-btn-handler');
-              console.log('Cookie-Banner geklickt.');
-            } catch (e) {
-              console.log('Kein Cookie-Banner gefunden.');
-            }
+            await new Promise(r => setTimeout(r, 2000));
+
+            const clicked = await page.evaluate(() => {
+              const exactKeywords = ['ok', 'akzeptieren', 'zustimmen', 'einverstanden'];
+              const containsKeywords = ['alle akzeptieren', 'accept all', 'ich stimme zu'];
+              const buttons = Array.from(document.querySelectorAll('button, a'));
+              for (const btn of buttons) {
+                const text = (btn.innerText || '').trim().toLowerCase();
+                if (exactKeywords.includes(text) || containsKeywords.some(k => text.includes(k))) {
+                  btn.click();
+                  return text;
+                }
+              }
+              return null;
+            });
+            console.log('Geklickter Button-Text:', clicked);
 
             await new Promise(r => setTimeout(r, 8000));
 
