@@ -176,20 +176,13 @@ jobs:
           node screenshot.js
           file docs/meteoblue.jpg
 
-      - name: Tesseract OCR installieren
-        run: sudo apt-get install -y tesseract-ocr
-
-      - name: Meteoblue-Zeitstempel auslesen, zuschneiden und einfügen
+      - name: Meteoblue-Zeitstempel berechnen, zuschneiden und einfügen
         run: |
-          convert docs/meteoblue.jpg -crop 44x24+928+674 +repage /tmp/time_crop.png
-          convert /tmp/time_crop.png -resize 400% -colorspace Gray -threshold 50% /tmp/time_crop_processed.png
-          RAW_TEXT=$(tesseract /tmp/time_crop_processed.png - 2>/dev/null | tr -d '[:space:]')
-          echo "Erkannter Text: $RAW_TEXT"
-
-          if ! echo "$RAW_TEXT" | grep -qE '^[0-9]{1,2}:[0-9]{2}$'; then
-            RAW_TEXT=$(TZ='Europe/Berlin' date +"%H:%M")
-            echo "OCR-Ergebnis unplausibel, nutze aktuelle Uhrzeit als Fallback: $RAW_TEXT"
-          fi
+          NOW_EPOCH=$(date -u +%s)
+          ROUNDED_EPOCH=$(( NOW_EPOCH - (NOW_EPOCH % 900) ))
+          FINAL_EPOCH=$(( ROUNDED_EPOCH - 1800 ))
+          RAW_TEXT=$(TZ='Europe/Berlin' date -d @${FINAL_EPOCH} +"%H:%M")
+          echo "Berechneter Zeitstempel: $RAW_TEXT"
 
           convert docs/meteoblue.jpg -crop 360x270+315+193 +repage docs/meteoblue.jpg
 
