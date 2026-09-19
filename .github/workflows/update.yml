@@ -193,7 +193,7 @@ jobs:
 
           convert docs/meteoblue.jpg -crop 360x270+315+193 +repage docs/meteoblue.jpg
 
-          convert -size 54x24 xc:black -fill white -gravity center -pointsize 19 -annotate 0 "$RAW_TEXT" /tmp/time_box.png
+          convert -size 56x24 xc:black -fill white -gravity center -pointsize 19 -annotate 0 "$RAW_TEXT" /tmp/time_box.png
           convert docs/meteoblue.jpg /tmp/time_box.png -gravity SouthEast -geometry +0+13 -composite docs/meteoblue.jpg
             
       - name: Meteoblue-Frame speichern
