@@ -203,6 +203,35 @@ jobs:
           REST=$(echo "$ALL" | head -n -1)
           convert -delay 100 -loop 0 $REST -delay 200 "$LAST" docs/meteoblue.gif
 
+      - name: Wetteronline-Radar Test
+        run: |
+          npm install puppeteer
+          cat > wo_test.js << 'EOF'
+          const puppeteer = require('puppeteer');
+
+          (async () => {
+            const browser = await puppeteer.launch({
+              headless: 'new',
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1280, height: 720 });
+            await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+            const response = await page.goto('https://www.wetteronline.de/wetterradar?wrg=10382&wrx=52.63,12.75&wry=52.504,13.305&wrn=QmVybGlu&wrm=8.67', {
+              waitUntil: 'networkidle2',
+              timeout: 60000
+            });
+            console.log('HTTP-Status:', response.status());
+
+            await new Promise(r => setTimeout(r, 5000));
+            await page.screenshot({ path: 'docs/wetteronline_test.jpg', type: 'jpeg', quality: 85 });
+            await browser.close();
+          })();
+          EOF
+          node wo_test.js
+          file docs/wetteronline_test.jpg
+
       - name: Änderungen speichern
         run: |
           git config user.name "github-actions[bot]"
