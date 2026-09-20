@@ -1,7 +1,6 @@
 name: Update Wolken GIF
 
 on:
-  
   workflow_dispatch:
 
 jobs:
@@ -43,7 +42,7 @@ jobs:
             -fill red -stroke white -strokewidth 1 -draw "circle 766,150 771,150" \
             docs/eumetsat.jpg
           file "docs/eumetsat.jpg"
-     
+
       - name: Meteosat-Aktualität prüfen und ggf. benachrichtigen
         run: |
           LATEST=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)" | grep -oE '[0-9]{14}' | sort -n | tail -1)
@@ -69,8 +68,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add frames docs
-          git commit -m "Update Wolken GIF" || echo "Keine Änderungen"
+          git add docs
+          git commit -m "Update EUMETSAT-Bild" || echo "Keine Änderungen"
           git pull --rebase origin main
 
           for i in 1 2 3; do
