@@ -1,4 +1,4 @@
-name: Update Wolken GIF
+name: Update EUMETSAT-Bild
 
 on:
   workflow_dispatch:
