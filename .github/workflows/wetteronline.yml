@@ -80,7 +80,7 @@ jobs:
 
           convert docs/wetteronline.jpg -crop 680x510+772+459 +repage docs/wetteronline.jpg
 
-          convert -size 100x46 xc:black -fill white -gravity center -pointsize 35 -annotate 0 "$RAW_TEXT" /tmp/wo_time_box.png
+          convert -size 102x46 xc:black -fill white -gravity center -pointsize 35 -annotate 0 "$RAW_TEXT" /tmp/wo_time_box.png
           convert docs/wetteronline.jpg /tmp/wo_time_box.png -gravity SouthEast -geometry +9+24 -composite docs/wetteronline.jpg
 
       - name: Wetteronline-Frame speichern
