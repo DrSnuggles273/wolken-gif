@@ -3,6 +3,10 @@ name: Update Wetteronline GIF
 on:
   workflow_dispatch:
 
+concurrency:
+  group: wetteronline
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -104,14 +108,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs wetteronline_frames
           git commit -m "Update Wetteronline GIF" || echo "Keine Änderungen"
-          git pull --rebase origin main
 
           for i in 1 2 3; do
-            if git push; then
+            if git pull --rebase -X theirs origin main && git push; then
               echo "Push erfolgreich."
-              break
-            else
-              echo "Push fehlgeschlagen (Versuch $i), warte 10 Sekunden..."
-              sleep 10
+              exit 0
             fi
+            echo "Versuch $i fehlgeschlagen, räume auf und wiederhole..."
+            git rebase --abort 2>/dev/null || true
+            sleep 10
           done
+          echo "Push endgültig fehlgeschlagen."
+          exit 1
