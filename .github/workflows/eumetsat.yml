@@ -45,7 +45,13 @@ jobs:
 
       - name: Meteosat-Aktualität prüfen und ggf. benachrichtigen
         run: |
-          LATEST=$(curl -s -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)" | grep -oE '[0-9]{14}' | sort -n | tail -1)
+          LATEST=$(curl -s --max-time 20 -A "Mozilla/5.0" "https://slider.cira.colostate.edu/data/json/meteosat-12/full_disk/geocolor/latest_times.json?_=$(date +%s)" | grep -oE '[0-9]{14}' | sort -n | tail -1 || true)
+
+          if [ -z "$LATEST" ]; then
+            echo "CIRA-Zeitstempel nicht abrufbar, überspringe Prüfung."
+            exit 0
+          fi
+
           LATEST_EPOCH=$(date -u -d "${LATEST:0:8} ${LATEST:8:2}:${LATEST:10:2}:${LATEST:12:2}" +%s)
           NOW_EPOCH=$(date -u +%s)
           AGE=$(( (NOW_EPOCH - LATEST_EPOCH) / 60 ))
